@@ -5,39 +5,42 @@ import estruturas.arrays.ArrayLinear;
 import estruturas.arrays.ArrayOrdenado;
 import estruturas.hash.TabelaHash;
 import estruturas.listas.ListaDuplamenteEncadeada;
+import estruturas.arvores.ArvoreBinariaBusca;
+import estruturas.arvores.ArvoreAVL;
+import estruturas.arvores.ArvoreRubroNegra;
 
 public class Cronometro {
-    private GerenciadorDeTestes gerador;
+    private GeradorDeDados gerador;
     private String tipoEstrutura;
     private int n;
 
-    public Cronometro(GerenciadorDeTestes gerador, String tipoEstrutura, int n) {
+    public Cronometro(GeradorDeDados gerador, String tipoEstrutura, int n) {
         this.gerador = gerador;
         this.tipoEstrutura = tipoEstrutura;
         this.n = n;
     }
 
-    /**
-     * Método simples e direto para instanciar a estrutura correta baseada no nome.
-     */
     private EstruturaDeDados criarEstrutura() {
-        if (tipoEstrutura.equals("ArrayLinear")) {
-            return new ArrayLinear(n);
-        } else if (tipoEstrutura.equals("ArrayOrdenado")) {
-            return new ArrayOrdenado(n);
-        } else if (tipoEstrutura.equals("ListaDuplamenteEncadeada")) {
-            return new ListaDuplamenteEncadeada();
-        } else if (tipoEstrutura.equals("TabelaHash")) {
-            // Usa n para a capacidade inicial
-            return new TabelaHash(n); 
+        switch (tipoEstrutura) {
+            case "ArrayLinear":
+                return new ArrayLinear(n);
+            case "ArrayOrdenado":
+                return new ArrayOrdenado(n);
+            case "ListaDuplamenteEncadeada":
+                return new ListaDuplamenteEncadeada();
+            case "TabelaHash":
+                return new TabelaHash(n);
+            case "ArvoreBinariaBusca":
+                return new ArvoreBinariaBusca();
+            case "ArvoreAVL":
+                return new ArvoreAVL();
+            case "ArvoreRubroNegra":
+                return new ArvoreRubroNegra();
+            default:
+                return null;
         }
-        return null; // Caso passe um nome inválido
     }
 
-    /**
-     * Reconstroi a estrutura com os 'n' valores iniciais
-     * antes de cada repetição, conforme exigido
-     */
     private EstruturaDeDados prepararEstrutura() {
         EstruturaDeDados estrutura = criarEstrutura();
         for (int valor : gerador.dadosIniciais) {
@@ -48,9 +51,8 @@ public class Cronometro {
 
     public long[] testarConstrucao() {
         long[] tempos = new long[5];
-        // 6 execuções: i=0 (aquecimento), i=1 a 5 (medições)
         for (int i = 0; i < 6; i++) {
-            EstruturaDeDados estrutura = criarEstrutura(); // Começa vazio
+            EstruturaDeDados estrutura = criarEstrutura();
             
             long inicio = System.nanoTime();
             for (int valor : gerador.dadosIniciais) {

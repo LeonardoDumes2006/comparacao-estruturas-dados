@@ -1,105 +1,88 @@
 package estruturas.utils;
 
-import java.util.Random;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
 
 public class GerenciadorDeTestes {
-    private int n;
-    private Random random;
 
-    // Arrays que guardarão os dados pré-gerados para os testes
-    public int[] dadosIniciais;
-    public int[] buscasPresentes;
-    public int[] buscasAusentes;
-    public int[] insercoes;
-    public int[] remocoes;
-    public int[] intervalosMinimos;
+    public void executarTodosOsTestes() {
+        int[] tamanhos = {5000, 10000, 100000};
+        String[] ordens = {"CRESCENTE", "DECRESCENTE", "ALEATORIA"};
+        String[] estruturas = {
+            "ArrayLinear", 
+            "ArrayOrdenado", 
+            "ListaDuplamenteEncadeada", 
+            "TabelaHash", 
+            "ArvoreBinariaBusca", 
+            "ArvoreAVL", 
+            "ArvoreRubroNegra"
+        };
 
-    public GerenciadorDeTestes(int n, String ordem) {
-        this.n = n;
-        // Fixa a semente 42 para a geração aleatória, garantindo testes justos
-        this.random = new Random(42); 
-        gerarTudo(ordem);
-    }
+        // Prepara o ficheiro CSV para escrita
+        try (PrintWriter writer = new PrintWriter(new FileWriter("resultados.csv"))) {
+            // Cabeçalho do CSV
+            writer.println("Estrutura;Tamanho;Ordem;Operacao;TempoTotalMediana(ms);TempoPorOperacao(ns)");
 
-    private void gerarTudo(String ordem) {
-        int qtdDezPorcento = (int) (n * 0.10);
+            for (int n : tamanhos) {
+                for (String ordem : ordens) {
+                    System.out.println("A gerar dados para Tamanho: " + n + " | Ordem: " + ordem);
+                    GeradorDeDados gerador = new GeradorDeDados(n, ordem);
 
-        // 1. DADOS INICIAIS: pares de 2 até 2n[cite: 1]
-        dadosIniciais = new int[n];
-        for (int i = 0; i < n; i++) {
-            dadosIniciais[i] = (i + 1) * 2;
-        }
+                    for (String nomeEstrutura : estruturas) {
+                        System.out.println("A testar: " + nomeEstrutura + "...");
+                        
+                        Cronometro cronometro = new Cronometro(gerador, nomeEstrutura, n);
 
-        if (ordem.equals("DECRESCENTE")) {
-            reverterArray(dadosIniciais);
-        } else if (ordem.equals("ALEATORIA")) {
-            embaralharArray(dadosIniciais);
-        }
+                        // 1. Construção
+                        long[] tConstrucao = cronometro.testarConstrucao();
+                        salvarResultado(writer, nomeEstrutura, n, ordem, "Construcao", tConstrucao, n);
 
-        // 2. BUSCA PRESENTE: 2.000 buscas por valores sorteados do conjunto inicial
-        buscasPresentes = new int[2000];
-        for (int i = 0; i < 2000; i++) {
-            buscasPresentes[i] = dadosIniciais[random.nextInt(n)];
-        }
+                        // 2. Busca Presente
+                        long[] tBuscaP = cronometro.testarBuscaPresente();
+                        salvarResultado(writer, nomeEstrutura, n, ordem, "Busca Presente", tBuscaP, 2000);
 
-        // 3. BUSCA AUSENTE: 2.000 buscas por ímpares sorteados entre 1 e 2n-1
-        buscasAusentes = new int[2000];
-        for (int i = 0; i < 2000; i++) {
-            buscasAusentes[i] = random.nextInt(n) * 2 + 1; 
-        }
+                        // 3. Busca Ausente
+                        long[] tBuscaA = cronometro.testarBuscaAusente();
+                        salvarResultado(writer, nomeEstrutura, n, ordem, "Busca Ausente", tBuscaA, 2000);
 
-        // 4. INSERÇÃO: 10% de n elementos, ímpares distintos entre 1 e 2n-1
-        insercoes = gerarImparesDistintos(qtdDezPorcento);
+                        // 4. Inserção (10%)
+                        long[] tInsercao = cronometro.testarInsercao();
+                        int qtdDezPorcento = (int) (n * 0.10);
+                        salvarResultado(writer, nomeEstrutura, n, ordem, "Insercao", tInsercao, qtdDezPorcento);
 
-        // 5. REMOÇÃO: 10% de n elementos distintos, sorteados do conjunto inicial
-        remocoes = gerarRemocoesDistintas(qtdDezPorcento);
+                        // 5. Remoção (10%)
+                        long[] tRemocao = cronometro.testarRemocao();
+                        salvarResultado(writer, nomeEstrutura, n, ordem, "Remocao", tRemocao, qtdDezPorcento);
 
-        // 6. INTERVALO: 200 consultas, mínimo sorteado entre 1 e 2n - 100
-        intervalosMinimos = new int[200];
-        int limiteMaximoMinimo = (2 * n) - 100;
-        for (int i = 0; i < 200; i++) {
-            intervalosMinimos[i] = random.nextInt(limiteMaximoMinimo) + 1;
-        }
-    }
+                        // 6. Consulta por Intervalo
+                        long[] tIntervalo = cronometro.testarConsultaPorIntervalo();
+                        salvarResultado(writer, nomeEstrutura, n, ordem, "Consulta Intervalo", tIntervalo, 200);
+                    }
+                }
+            }
+            System.out.println("Testes concluídos! Resultados guardados em 'resultados.csv'.");
 
-    // --- Métodos Auxiliares ---
-
-    private void reverterArray(int[] array) {
-        for (int i = 0; i < array.length / 2; i++) {
-            int temp = array[i];
-            array[i] = array[array.length - 1 - i];
-            array[array.length - 1 - i] = temp;
+        } catch (IOException e) {
+            System.out.println("Erro ao gravar o ficheiro CSV: " + e.getMessage());
         }
     }
 
-    private void embaralharArray(int[] array) {
-        for (int i = array.length - 1; i > 0; i--) {
-            int index = random.nextInt(i + 1);
-            int temp = array[index];
-            array[index] = array[i];
-            array[i] = temp;
-        }
-    }
-
-    private int[] gerarImparesDistintos(int quantidade) {
-        int[] todosImpares = new int[n];
-        for (int i = 0; i < n; i++) {
-            todosImpares[i] = i * 2 + 1;
-        }
-        embaralharArray(todosImpares); // Embaralha para pegar aleatórios distintos
+    private void salvarResultado(PrintWriter writer, String estrutura, int tamanho, String ordem, 
+                                 String operacao, long[] tempos, int qtdOperacoes) {
+        // Ordena os 5 tempos e pega a mediana (índice 2)
+        Arrays.sort(tempos);
+        long medianaNanos = tempos[2];
         
-        int[] resultado = new int[quantidade];
-        System.arraycopy(todosImpares, 0, resultado, 0, quantidade);
-        return resultado;
-    }
+        double medianaMillis = medianaNanos / 1_000_000.0;
+        long tempoPorOperacao = medianaNanos / qtdOperacoes;
 
-    private int[] gerarRemocoesDistintas(int quantidade) {
-        int[] copiaIniciais = new int[n];
-        System.arraycopy(dadosIniciais, 0, copiaIniciais, 0, n);
-        embaralharArray(copiaIniciais);
+        // Formata a linha separada por ponto e vírgula
+        // Substituímos o ponto decimal por vírgula para o Excel reconhecer os milissegundos em PT-BR
+        String linha = String.format("%s;%d;%s;%s;%.2f;%d", 
+                estrutura, tamanho, ordem, operacao, medianaMillis, tempoPorOperacao);
         
-        int[] resultado = new int[quantidade];
-        System.arraycopy(copiaIniciais, 0, resultado, 0, quantidade);
-        return resultado;
+        writer.println(linha);
     }
 }

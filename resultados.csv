@@ -1,0 +1,10 @@
+Estrutura;Tamanho;Ordem;Operacao;TempoTotalMediana(ms);TempoPorOperacao(ns)
+ArrayLinear;5000;CRESCENTE;Construcao;3,43;685
+ArrayLinear;5000;CRESCENTE;Busca Presente;1,18;589
+ArrayLinear;5000;CRESCENTE;Busca Ausente;1,81;902
+ArrayLinear;5000;CRESCENTE;Insercao;0,41;811
+ArrayLinear;5000;CRESCENTE;Remocao;0,26;519
+ArrayLinear;5000;CRESCENTE;Consulta Intervalo;0,32;1597
+ArrayOrdenado;5000;CRESCENTE;Construcao;0,22;43
+ArrayOrdenado;5000;CRESCENTE;Busca Presente;0,27;137
+ArrayOrdenado;5000;CRESCENTE;Busc
