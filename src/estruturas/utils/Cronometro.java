@@ -36,7 +36,7 @@ public class Cronometro {
 
     /**
      * Reconstroi a estrutura com os 'n' valores iniciais
-     * antes de cada repetição, conforme exigido[cite: 2, 3].
+     * antes de cada repetição, conforme exigido
      */
     private EstruturaDeDados prepararEstrutura() {
         EstruturaDeDados estrutura = criarEstrutura();
@@ -48,9 +48,9 @@ public class Cronometro {
 
     public long[] testarConstrucao() {
         long[] tempos = new long[5];
-        // 6 execuções: i=0 (aquecimento), i=1 a 5 (medições)[cite: 3]
+        // 6 execuções: i=0 (aquecimento), i=1 a 5 (medições)
         for (int i = 0; i < 6; i++) {
-            EstruturaDeDados estrutura = criarEstrutura(); // Começa vazio[cite: 2]
+            EstruturaDeDados estrutura = criarEstrutura(); // Começa vazio
             
             long inicio = System.nanoTime();
             for (int valor : gerador.dadosIniciais) {
