@@ -7,11 +7,11 @@ import estruturas.hash.TabelaHash;
 import estruturas.listas.ListaDuplamenteEncadeada;
 
 public class Cronometro {
-    private GeradorDeDados gerador;
+    private GerenciadorDeTestes gerador;
     private String tipoEstrutura;
     private int n;
 
-    public Cronometro(GeradorDeDados gerador, String tipoEstrutura, int n) {
+    public Cronometro(GerenciadorDeTestes gerador, String tipoEstrutura, int n) {
         this.gerador = gerador;
         this.tipoEstrutura = tipoEstrutura;
         this.n = n;

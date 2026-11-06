@@ -6,7 +6,6 @@ public class GeradorDeDados {
     private int n;
     private Random random;
 
-    // Arrays que guardarão os dados pré-gerados para os testes
     public int[] dadosIniciais;
     public int[] buscasPresentes;
     public int[] buscasAusentes;
@@ -24,7 +23,7 @@ public class GeradorDeDados {
     private void gerarTudo(String ordem) {
         int qtdDezPorcento = (int) (n * 0.10);
 
-        // 1. DADOS INICIAIS: pares de 2 até 2n[cite: 1]
+        // 1. DADOS INICIAIS: pares de 2 até 2n
         dadosIniciais = new int[n];
         for (int i = 0; i < n; i++) {
             dadosIniciais[i] = (i + 1) * 2;
@@ -62,8 +61,6 @@ public class GeradorDeDados {
         }
     }
 
-    // --- Métodos Auxiliares ---
-
     private void reverterArray(int[] array) {
         for (int i = 0; i < array.length / 2; i++) {
             int temp = array[i];
@@ -86,7 +83,7 @@ public class GeradorDeDados {
         for (int i = 0; i < n; i++) {
             todosImpares[i] = i * 2 + 1;
         }
-        embaralharArray(todosImpares); // Embaralha para pegar aleatórios distintos
+        embaralharArray(todosImpares); 
         
         int[] resultado = new int[quantidade];
         System.arraycopy(todosImpares, 0, resultado, 0, quantidade);
